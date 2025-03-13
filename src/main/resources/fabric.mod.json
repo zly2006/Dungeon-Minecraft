@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "dungeon",
+  "version": "${version}",
+  "name": "Dungeon",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/dungeon/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "com.github.zly2006.dungeon.client.DungeonClient"
+      }
+    ],
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "com.github.zly2006.dungeon.Dungeon"
+      }
+    ]
+  },
+  "mixins": [
+    "dungeon.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16",
+    "fabric-language-kotlin": "*",
+    "fabric": "*",
+    "minecraft": "~1.21"
+  }
+}
