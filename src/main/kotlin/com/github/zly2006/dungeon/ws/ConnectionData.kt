@@ -12,6 +12,7 @@ class ConnectionData(
     var maxStrengthA: Int = 0
     var maxStrengthB: Int = 0
     var lastSyncTime: Long = 0
+    var lastServerTime: Long = 0
     var lastStrengthA: Int = 0
     var lastStrengthB: Int = 0
     companion object {

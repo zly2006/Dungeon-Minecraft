@@ -16,6 +16,7 @@ import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
 import java.net.InetSocketAddress
 import java.util.*
+import kotlin.math.ceil
 
 class DungeonWSServer(
     val server: MinecraftServer,
@@ -65,7 +66,7 @@ class DungeonWSServer(
         else {
             data.lastStrengthB = strength
         }
-        data.lastSyncTime = System.currentTimeMillis()
+        data.lastServerTime = System.currentTimeMillis()
     }
 
     fun tick() {
@@ -76,16 +77,22 @@ class DungeonWSServer(
                     val strength = maxOf(it.lastStrengthA - decrease, 0)
                     setStrength(it, "A", strength)
                     it.lastStrengthA = strength
-                    it.lastSyncTime = System.currentTimeMillis()
+                    it.lastServerTime = System.currentTimeMillis()
                 }
                 if (it.lastStrengthB > 0) {
                     val decrease = it.maxStrengthB / 6
                     val strength = maxOf(it.lastStrengthB - decrease, 0)
                     setStrength(it, "B", strength)
                     it.lastStrengthB = strength
-                    it.lastSyncTime = System.currentTimeMillis()
+                    it.lastServerTime = System.currentTimeMillis()
                 }
             }
+//            if (it.lastStrengthA == 0 && it.lastStrengthB == 0 &&
+//                it.lastSyncTime + 5000 < it.lastServerTime
+//            ) {
+//                it.player?.networkHandler?.disconnect(Text.literal("郊狼已断开连接"))
+//                connectionData.remove(it.targetId)
+//            }
         }
     }
 
@@ -192,7 +199,7 @@ class DungeonWSServer(
             setStrength(
                 data,
                 "A",
-                (amount / 20 * data.maxStrengthA).toInt()
+                ceil(amount / 20 * data.maxStrengthA).toInt()
             )
         }
     }
