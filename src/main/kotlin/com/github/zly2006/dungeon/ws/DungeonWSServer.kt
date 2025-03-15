@@ -1,9 +1,14 @@
 package com.github.zly2006.dungeon.ws
 
+import com.github.zly2006.dungeon.DAMAGE_AMPLIFIER
 import com.github.zly2006.dungeon.net.DungeonPackets
 import com.github.zly2006.dungeon.ws.ConnectionData.Companion.connectionData
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.entity.damage.DamageSource
@@ -46,6 +51,20 @@ class DungeonWSServer(
                     "strength-$c+2+$s"
                 )
             }
+
+            val pulse = listOf(
+                "4A4A4A4A64646464",
+                "4545454564646464",
+                "4040404064646464",
+                "3B3B3B3B64646464",
+                "3636363664646464",
+                "3232323264646464",
+                "2D2D2D2D64646464",
+                "2828282864646464",
+                "2323232364646464",
+                "1E1E1E1E64646464",
+                "1A1A1A1A64646464"
+            )
         }
     }
 
@@ -59,6 +78,10 @@ class DungeonWSServer(
     }
 
     fun setStrength(data: ConnectionData, channel: String, strength: Int) {
+        val strength = strength.coerceIn(
+            0,
+            if (channel == "A") data.maxStrengthA else data.maxStrengthB
+        )
         data.webSocket.send(DungeonData.setStrength(data, channel, strength))
         if (channel == "A") {
             data.lastStrengthA = strength
@@ -71,7 +94,7 @@ class DungeonWSServer(
 
     fun tick() {
         connectionData.values.forEach {
-            if (it.lastSyncTime + 500 < System.currentTimeMillis()) {
+            if (it.lastServerTime + 500 < System.currentTimeMillis()) {
                 if (it.lastStrengthA > 0) {
                     val decrease = it.maxStrengthA / 6
                     val strength = maxOf(it.lastStrengthA - decrease, 0)
@@ -181,6 +204,30 @@ class DungeonWSServer(
     }
 
     override fun onStart() {
+        GlobalScope.launch {
+            while (true) {
+                delay(1000)
+                connectionData.forEach {
+                    val p0 = it.value.webSocket
+                    p0.send(
+                        DungeonData(
+                            "msg",
+                            it.value.clientId,
+                            it.value.targetId,
+                            "pulse-A:" + Json.encodeToJsonElement(DungeonData.pulse)
+                        )
+                    )
+                    p0.send(
+                        DungeonData(
+                            "msg",
+                            it.value.clientId,
+                            it.value.targetId,
+                            "pulse-B:" + Json.encodeToJsonElement(DungeonData.pulse)
+                        )
+                    )
+                }
+            }
+        }
     }
 
     override fun stop() {
@@ -199,7 +246,7 @@ class DungeonWSServer(
             setStrength(
                 data,
                 "A",
-                ceil(amount / 20 * data.maxStrengthA).toInt()
+                ceil(amount / 20 * data.maxStrengthA * DAMAGE_AMPLIFIER).toInt()
             )
         }
     }
