@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.packet.CustomPayload
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.world.GameMode
 
@@ -82,7 +83,7 @@ object DungeonPackets {
                     )
                 )
                 handler.player.changeGameMode(GameMode.SPECTATOR)
-                handler.player.sendMessage(net.minecraft.text.Text.literal("请扫描二维码加入游戏"))
+                handler.player.sendMessage(Text.literal("请扫描二维码加入游戏"))
             }
         }
     }
