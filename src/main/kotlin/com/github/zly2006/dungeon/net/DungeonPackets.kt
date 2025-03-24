@@ -10,7 +10,6 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.packet.CustomPayload
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import net.minecraft.world.GameMode
 
 object DungeonPackets {
     data class TradePayload(val index: Int, val tradeAll: Boolean) : CustomPayload {
@@ -82,7 +81,6 @@ object DungeonPackets {
                         url
                     )
                 )
-                handler.player.changeGameMode(GameMode.SPECTATOR)
                 handler.player.sendMessage(Text.literal("请扫描二维码加入游戏"))
             }
         }

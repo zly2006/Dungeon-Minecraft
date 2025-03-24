@@ -15,7 +15,6 @@ import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
-import net.minecraft.world.GameMode
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
@@ -134,7 +133,7 @@ class DungeonWSServer(
     override fun onClose(p0: WebSocket, p1: Int, p2: String, p3: Boolean) {
         println("Connection closed${p0.remoteSocketAddress} with exit code $p1 additional info: $p2")
         connectionData.filterValues { it.webSocket == p0 }.forEach {
-            it.value.player?.networkHandler?.disconnect(Text.literal("郊狼已断开连接"))
+            it.value.player?.sendMessage(Text.literal("郊狼已断开连接，重进服务器以重新连接。"))
             connectionData.remove(it.key)
         }
     }
@@ -151,7 +150,6 @@ class DungeonWSServer(
                     val player = server.playerManager.getPlayer(uuid)
                     connectionData[data.targetId]?.player = player
                     player?.sendMessage(Text.literal("郊狼绑定成功"))
-                    player?.changeGameMode(GameMode.SURVIVAL)
                 }
                 p0.send(
                     DungeonData(
