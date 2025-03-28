@@ -1,5 +1,6 @@
 package com.github.zly2006.dungeon
 
+import com.github.zly2006.dungeon.config.DungeonConfig
 import com.github.zly2006.dungeon.net.DungeonPackets
 import com.github.zly2006.dungeon.ws.ConnectionData
 import com.github.zly2006.dungeon.ws.DungeonWSServer
@@ -21,6 +22,7 @@ import java.net.URL
 object Dungeon : ModInitializer {
     lateinit var socketAddress: String
     lateinit var webSocketServer: DungeonWSServer
+    private lateinit var config: DungeonConfig
 
     override fun onInitialize() {
         val ip = if (FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
@@ -35,10 +37,12 @@ object Dungeon : ModInitializer {
             val ip = Gson().fromJson(string, JsonObject::class.java).get("ip").asString
             ip
         }
-        socketAddress = "ws://$ip:2060"
+        config = DungeonConfig.load()
+        val port = config.websocketPort
+        socketAddress = "ws://$ip:$port"
         DungeonPackets.registerServer()
         ServerLifecycleEvents.SERVER_STARTED.register {
-            webSocketServer = DungeonWSServer(it)
+            webSocketServer = DungeonWSServer(it, config.websocketPort)
             webSocketServer.start()
             Runtime.getRuntime().addShutdownHook(Thread {
                 webSocketServer.stop()

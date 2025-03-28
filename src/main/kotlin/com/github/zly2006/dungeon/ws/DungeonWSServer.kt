@@ -26,7 +26,8 @@ import kotlin.math.ceil
 
 class DungeonWSServer(
     val server: MinecraftServer,
-) : WebSocketServer(InetSocketAddress("0.0.0.0", 2060)) {
+    websocketPort: Int,
+) : WebSocketServer(InetSocketAddress("0.0.0.0", websocketPort)) {
     @Serializable
     class DungeonData(
         val type: String,
