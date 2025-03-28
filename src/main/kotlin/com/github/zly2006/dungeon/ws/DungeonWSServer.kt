@@ -1,7 +1,9 @@
 package com.github.zly2006.dungeon.ws
 
 import com.github.zly2006.dungeon.DAMAGE_AMPLIFIER
+import com.github.zly2006.dungeon.Dungeon.socketAddress
 import com.github.zly2006.dungeon.net.DungeonPackets
+import com.github.zly2006.dungeon.net.DungeonPackets.WebsocketJoinPacket
 import com.github.zly2006.dungeon.ws.ConnectionData.Companion.connectionData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -133,7 +135,16 @@ class DungeonWSServer(
     override fun onClose(p0: WebSocket, p1: Int, p2: String, p3: Boolean) {
         println("Connection closed${p0.remoteSocketAddress} with exit code $p1 additional info: $p2")
         connectionData.filterValues { it.webSocket == p0 }.forEach {
-            it.value.player?.sendMessage(Text.literal("郊狼已断开连接，重进服务器以重新连接。"))
+            val player = it.value.player
+            if (player != null) {
+                player.sendMessage(Text.literal("郊狼已断开连接，重进服务器以重新连接。"))
+                val url = "$socketAddress/${player.uuidAsString}"
+                ServerPlayNetworking.send(
+                    player,
+                    WebsocketJoinPacket(url)
+                )
+                player.sendMessage(Text.literal("请扫描二维码加入游戏"))
+            }
             connectionData.remove(it.key)
         }
     }
