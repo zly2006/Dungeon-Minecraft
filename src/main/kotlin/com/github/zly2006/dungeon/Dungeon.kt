@@ -23,7 +23,7 @@ object Dungeon : ModInitializer {
     lateinit var webSocketServer: DungeonWSServer
 
     override fun onInitialize() {
-        val ip = if (FabricLoader.getInstance().environmentType != EnvType.CLIENT) {
+        val ip = if (FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
             DatagramSocket().use { socket ->
                 socket.connect(InetAddress.getByName("8.8.8.8"), 10002)
                 socket.localAddress.hostAddress
