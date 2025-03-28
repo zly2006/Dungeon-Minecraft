@@ -1,7 +1,7 @@
 package com.github.zly2006.dungeon.ws
 
-import com.github.zly2006.dungeon.DAMAGE_AMPLIFIER
 import com.github.zly2006.dungeon.Dungeon.socketAddress
+import com.github.zly2006.dungeon.config.DungeonConfig
 import com.github.zly2006.dungeon.net.DungeonPackets
 import com.github.zly2006.dungeon.net.DungeonPackets.WebsocketJoinPacket
 import com.github.zly2006.dungeon.ws.ConnectionData.Companion.connectionData
@@ -26,8 +26,8 @@ import kotlin.math.ceil
 
 class DungeonWSServer(
     val server: MinecraftServer,
-    websocketPort: Int,
-) : WebSocketServer(InetSocketAddress("0.0.0.0", websocketPort)) {
+    val config: DungeonConfig,
+) : WebSocketServer(InetSocketAddress("0.0.0.0", config.websocketPort)) {
     @Serializable
     class DungeonData(
         val type: String,
@@ -256,7 +256,7 @@ class DungeonWSServer(
             setStrength(
                 data,
                 "A",
-                ceil(amount / 20 * data.maxStrengthA * DAMAGE_AMPLIFIER).toInt()
+                ceil(amount / 20 * data.maxStrengthA * config.damageAmplifier).toInt()
             )
         }
     }

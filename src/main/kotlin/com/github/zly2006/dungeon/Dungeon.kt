@@ -42,7 +42,7 @@ object Dungeon : ModInitializer {
         socketAddress = "ws://$ip:$port"
         DungeonPackets.registerServer()
         ServerLifecycleEvents.SERVER_STARTED.register {
-            webSocketServer = DungeonWSServer(it, config.websocketPort)
+            webSocketServer = DungeonWSServer(it, config)
             webSocketServer.start()
             Runtime.getRuntime().addShutdownHook(Thread {
                 webSocketServer.stop()
@@ -63,12 +63,15 @@ object Dungeon : ModInitializer {
                                 player.sendMessage(Text.literal("Client ID: ${connectionData.clientId}"))
                                 player.sendMessage(Text.literal("Target ID: ${connectionData.targetId}"))
                             } else {
-                                player.sendMessage(Text.literal("Not connected"), false)
+                                player.sendMessage(Text.literal("Not connected"))
                             }
                             1
                         }
                     }
                     literal("set-strength") {
+                        requires = {
+                            it.hasPermissionLevel(4)
+                        }
                         argument("channel", StringArgumentType.word()) {
                             argument("strength", IntegerArgumentType.integer(0, 200)) {
                                 executes {

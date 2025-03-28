@@ -5,7 +5,8 @@ import net.fabricmc.loader.api.FabricLoader
 import java.io.File
 
 data class DungeonConfig(
-    val websocketPort: Int = 2060
+    val websocketPort: Int = 2060,
+    val damageAmplifier: Float = 5f,
 ) {
     companion object {
         private val configFile: File = FabricLoader.getInstance().configDir.resolve("dungeon.json").toFile()
